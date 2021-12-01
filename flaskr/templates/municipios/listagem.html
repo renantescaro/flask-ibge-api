@@ -1,0 +1,66 @@
+<!-- Listagem Municipios Ibge -->
+
+
+{% extends "template.html" %}
+{% block conteudo %}
+    <div>
+        <div id="dvDados" style="display: none;">
+            {{ dados }}
+        </div>
+        <br>
+        <div style="margin-left:10px; padding:0px; width:98%">
+            <div class="row">
+                <div class="col-6 col-md-1">
+                    <button id="downloadXlsx" class="btn btn-success btn-sm">
+                        Excel
+                        <i class="fas fa-file-excel"></i>
+                    </button>
+                </div>
+                <div class="col-6 col-md-2">
+                    <a href="/municipios/nova-consulta" class="btn btn-primary btn-sm">
+                        Atualizar Dados
+                        <i class="fas fa"></i>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div style="text-align: center;">
+                        <h4>{{titulo}}</h4>
+                    </div>
+                </div>
+            </div>
+            <div id="tblListagem"></div>
+        </div>
+    </div>
+
+    <script>
+        let dataInicio = document.getElementById("dataInicio")
+        let dataFinal  = document.getElementById("dataFinal")
+        let altura     = window.screen.height-250
+
+        var table = new Tabulator("#tblListagem", {
+            layout:"fitColumns",
+            pagination:"local",
+            height:altura,
+            movableColumns:true,
+            data:( JSON.parse(document.getElementById('dvDados').textContent) ),
+            columns:[
+                {title:"Id", field:"id", width:120, headerFilter:"input",
+                    bottomCalc:"count", bottomCalcFormatter:"plaintext", 
+                        bottomCalcFormatterParams:function(cell){
+                        cell._cell.value = 'Total ' + cell._cell.value
+                    }
+                },
+                {title:"Nome", field:"nome", width:250, headerFilter:"input"},
+            ],
+        })
+
+
+        // EXCEL
+        document.getElementById("downloadXlsx").addEventListener("click", function(){
+            table.download(
+                "xlsx", "listagem_municipios.xlsx", 
+                {sheetName:"Listagem de Municipios"}
+            )
+        })
+    </script>
+{% endblock %}
