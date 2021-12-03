@@ -1,0 +1,57 @@
+<!-- Listagem Indicadores -->
+
+
+{% extends "template.html" %}
+{% block conteudo %}
+    <div>
+        <div id="dvDados" style="display: none;">{{dados}}</div>
+        <br>
+        <div style="margin-left:10px; padding:0px; width:98%">
+            <div class="row">
+                <div class="col-6 col-md-1">
+                    <button id="downloadXlsx" class="btn btn-success btn-sm">
+                        Excel
+                        <i class="fas fa-file-excel"></i>
+                    </button>
+                </div>
+                <div class="col-6 col-md-8">
+                    <div style="text-align: center;">
+                        <h4>{{titulo}}</h4>
+                    </div>
+                </div>
+            </div>
+            <div id="tblListagem"></div>
+        </div>
+    </div>
+
+    <script>
+        let altura     = window.screen.height-250
+        var table = new Tabulator("#tblListagem", {
+            layout:"fitColumns",
+            height:altura,
+            movableColumns:true,
+            data:( JSON.parse(document.getElementById('dvDados').textContent) ),
+            columns:[
+                {title:"Id", field:"id", width:120, headerFilter:"input",
+                    bottomCalc:"count", bottomCalcFormatter:"plaintext", 
+                        bottomCalcFormatterParams:function(cell){
+                        cell._cell.value = 'Total ' + cell._cell.value
+                    }
+                },
+                {title:"Posição",   field:"posicao",   width:190, headerFilter:"input"},
+                {title:"Indicador", field:"indicador", width:200, headerFilter:"input"},
+                {title:"Classe",    field:"classe",    width:100, headerFilter:"input"},
+                {title:"Nota",      field:"nota",      width:300, headerFilter:"input"},
+            ],
+        })
+
+
+        // EXCEL
+        document.getElementById("downloadXlsx").addEventListener("click", function(){
+            table.download(
+                "xlsx", "listagem_municipios.xlsx", 
+                {sheetName:"Listagem de Municipios"}
+            )
+        })
+    </script>
+{% endblock %}
