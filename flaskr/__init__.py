@@ -4,6 +4,7 @@ from flaskr.controllers.produto_ctrl import bp as bp_produto
 from flaskr.controllers.populacao_ctrl import bp as bp_populacao
 from flaskr.controllers.municipio_ctrl import bp as bp_municipio
 from flaskr.controllers.pesquisa_ctrl import bp as bp_pesquisa
+from flaskr.controllers.indicador_ctrl import bp as bp_indicador
 
 
 def create_app(test_config=None):
@@ -25,4 +26,5 @@ def create_app(test_config=None):
     app.register_blueprint(bp_populacao)
     app.register_blueprint(bp_municipio)
     app.register_blueprint(bp_pesquisa)
+    app.register_blueprint(bp_indicador)
     return app
