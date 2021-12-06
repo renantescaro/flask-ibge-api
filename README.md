@@ -1,11 +1,7 @@
-#### estrutura básica Flask
-
-<br>
+#### Estrutura para testes da API do IBGE
 
 ### Instalar todas as dependências
 * pip install -r requirements.txt
-
-<br>
 
 ### Instalar dependências manualmente
 * flask==1.1.2
@@ -13,14 +9,8 @@
 * python-dotenv==0.17.0
 * requests
 
-<br>
-
 ### Configurações
 * arquivo .env
 
-<br>
-
 ### Executar aplicação
 * > python run.py
-
-<br>
