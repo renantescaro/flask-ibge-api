@@ -1,4 +1,28 @@
-<!-- Listagem Indicadores -->
+<!-- Listagem de Indicadores por Pesquisa -->
+
+<!-- dialogo pra selecionar a localidade -->
+<dialog close id="favLocalizacao">
+    <form method="dialog">
+        <section>
+            <p>
+                <label for="favLocal">Escolha a região:</label>
+                <select id="favLocal" name="favLocal">
+                    <option value=""></option>
+                    <option value="0">Brasil</option>
+                    <option value="1">Norte</option>
+                    <option value="2">Nordeste</option>
+                    <option value="3">Sudeste</option>
+                    <option value="4">Sul</option>
+                    <option value="5">Centro Oeste</option>
+                </select>
+            </p>
+        </section>
+        <menu>
+            <button value="cancel">Cancel</button>
+            <button id="btnConfirmaDialog" value="confirm">Confirm</button>
+        </menu>
+    </form>
+</dialog>
 
 
 {% extends "template.html" %}
@@ -14,6 +38,12 @@
                         <i class="fas fa-file-excel"></i>
                     </button>
                 </div>
+                <div class="col-6 col-md-2">
+                    <button id="consultar" class="btn btn-primary btn-sm">
+                        Consultar
+                        <i class="fas fa-binoculars"></i>
+                    </button>
+                </div>
                 <div class="col-6 col-md-8">
                     <div style="text-align: center;">
                         <h4>{{titulo}}</h4>
@@ -24,34 +54,98 @@
         </div>
     </div>
 
+
     <script>
-        let altura     = window.screen.height-250
+        var indicadorSelecionado = null
+
+        let altura = window.screen.height-250
         var table = new Tabulator("#tblListagem", {
             layout:"fitColumns",
             height:altura,
             movableColumns:true,
             data:( JSON.parse(document.getElementById('dvDados').textContent) ),
             columns:[
+                {formatter:"rowSelection", width:40, titleFormatter:"rowSelection",
+                    hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                    cell.getRow().toggleSelect();
+                }},
                 {title:"Id", field:"id", width:120, headerFilter:"input",
                     bottomCalc:"count", bottomCalcFormatter:"plaintext", 
                         bottomCalcFormatterParams:function(cell){
                         cell._cell.value = 'Total ' + cell._cell.value
                     }
                 },
-                {title:"Posição",   field:"posicao",   width:190, headerFilter:"input"},
+                {title:"Posição",   field:"posicao",   width:110, headerFilter:"input"},
                 {title:"Indicador", field:"indicador", width:200, headerFilter:"input"},
                 {title:"Classe",    field:"classe",    width:100, headerFilter:"input"},
-                {title:"Nota",      field:"nota",      width:300, headerFilter:"input"},
+                {title:"Nota",      field:"nota",      width:200, headerFilter:"input"},
             ],
         })
-
 
         // EXCEL
         document.getElementById("downloadXlsx").addEventListener("click", function(){
             table.download(
-                "xlsx", "listagem_municipios.xlsx", 
-                {sheetName:"Listagem de Municipios"}
+                "xlsx", "listagem_indicadores_pesquisa_{{id_pesquisa}}.xlsx", 
+                {sheetName:"Listagem de Indicadores pela Pesquisa {{id_pesquisa}}"}
             )
         })
+
+        // botão consultar consultar
+        document.getElementById('consultar').addEventListener('click', function(){
+            let linhasSelecionadas = table.getSelectedData()
+            if(linhasSelecionadas.length == 0){
+                alert('Nenhum indicador selecionado!')
+                return
+            }
+            abrirDialogLocalizacao()
+        })
+
+        // botão confirmar dialogo
+        document.getElementById('btnConfirmaDialog').addEventListener("click", function(){
+            setTimeout(
+                function(){
+                    let localizacao = getLocalizacaoSelecionada()
+                    if(localizacao != null){
+                        let posicao = getPosicaoLinhasSelecionadas()
+                        let link = montarLink(localizacao, posicao)
+                        window.open(link, '_blank').focus()
+                    }
+                },
+                200
+            )
+        })
+
+        function getPosicaoLinhasSelecionadas(){
+            posicao = ''
+            let linhasSelecionadas = table.getSelectedData()
+            linhasSelecionadas.forEach(linha => {
+                posicao += linha.posicao + '|'
+            })
+            posicao = posicao.substring(0, posicao.length - 1)
+            return posicao
+        }
+
+        var favLocalizacao = document.getElementById('favLocalizacao')
+        favLocalizacao.returnValue = 'favLocal'
+
+        function montarLink(localizacao, posicao){
+            let link = 'https://servicodados.ibge.gov.br/api/v1/pesquisas/{{id_pesquisa}}'
+            link += '/indicadores/'+posicao+'/resultados/'
+            link += localizacao
+            return link
+        }
+
+        function abrirDialogLocalizacao(){
+            favLocalizacao.showModal()
+        }
+
+        function getLocalizacaoSelecionada(){
+            let retorno = favLocalizacao.returnValue
+            if (retorno === 'cancel' || retorno == null) {
+                return null
+            } else if (retorno === 'confirm') {
+                return document.getElementById('favLocal').value
+            }
+        }
     </script>
 {% endblock %}
