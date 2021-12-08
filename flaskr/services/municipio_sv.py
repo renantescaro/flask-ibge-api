@@ -14,9 +14,8 @@ class MunicipioSv:
 
 
     def _gravar_arquivo_local(self, municipios):
-        f = open(self.caminho_json, 'w')
-        f.write(municipios)
-        f.close()
+        with open(self.caminho_json, 'w') as f:
+            f.write(municipios)
 
 
     # retorna todos municipios do ibge
