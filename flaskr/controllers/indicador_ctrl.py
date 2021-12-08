@@ -13,5 +13,6 @@ class IndicadorCtrl:
     def indicadores_por_pesquisa(id_pesquisa:int):
         return render_template(
             'indicador/listagem.html',
-            titulo = 'Listagem Indicadores por Pesquisa',
+            titulo = 'Listagem de Indicadores da Pesquisa '+str(id_pesquisa),
+            id_pesquisa = id_pesquisa,
             dados = json.dumps(IndicadorSv().todos_por_pesquisa(id_pesquisa)) )
